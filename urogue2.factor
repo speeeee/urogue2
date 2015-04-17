@@ -29,13 +29,24 @@ TUPLE: urogue-gadget < gadget { p initial: T{ player f { 0 0 } } }
    ! 10 16 0.0 glVertex3f 0.0 16 0.0 glVertex3f glEnd glFlush ;
    glEnd GL_TRIANGLES glBegin ! 1.0 1.0 0.0 glColor3f 
    ! -8 0.0 0.0 glVertex3f 8 0 0 glVertex3f 4 p
-   p>> pos>>
-   { [ { 2.5 4 } v+ second 60 / abs dup 0.0 glColor3f ]
-     [ drop -8 0 0 glVertex3f ]
-     [ drop 8 0 0 glVertex3f ] 
-     [ { 2.5 4 } v+ first2 0 glVertex3f ] } cleave 
+   p>> pos>> dup dup dup
+   dup first 2.5 <= [ { [ { 2.5 4 } v+ first 62 / abs dup 0.0 glColor3f ]
+     [ drop -8 0 0 glVertex3f ] [ drop -8 -25.6 0 glVertex3f ] 
+     [ { 2.5 4 } v+ first2 0 glVertex3f ] } cleave 1 ] when drop
+   dup second -25.6 <= [ { [ { 2.5 4 } v+ second 60 / abs dup 0.0 glColor3f ]
+     [ drop -8 -25.6 0 glVertex3f ] [ drop 8 -25.6 0 glVertex3f ] 
+     [ { 2.5 4 } v+ first2 0 glVertex3f ] } cleave 1 ] when drop
+   dup first 2.5 >= [ { [ { 2.5 4 } v+ first 62 / abs dup 0.0 glColor3f ]
+     [ drop 8 -25.6 0 glVertex3f ] [ drop 8 0 0 glVertex3f ] 
+     [ { 2.5 4 } v+ first2 0 glVertex3f ] } cleave 1 ] when drop
+   dup second -4 >= [ { [ { 2.5 4 } v+ second 60 / abs dup 0.0 glColor3f ]
+     [ drop -8 0 0 glVertex3f ] [ drop 8 0 0 glVertex3f ] 
+     [ { 2.5 4 } v+ first2 0 glVertex3f ] } cleave 1 ] when drop
+
    ! Actually '60 / 16 * 1.6 *' and '62 / 16 *'
-   0.5 0.5 1 glColor3f -8 0 0 glVertex3f 8 0 0 glVertex3f 0 -25.6 0 glVertex3f
+    1.0 1.0 0 glColor3f
+    -8 0 0 glVertex3f -8 -25.6 0 glVertex3f 8 -25.6 0 glVertex3f
+    -8 0 0 glVertex3f 8 0 0 glVertex3f 8 -25.6 0 glVertex3f
    glEnd glFlush ;
 
 :: assess ( g -- )
