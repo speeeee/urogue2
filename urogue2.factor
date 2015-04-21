@@ -19,13 +19,23 @@ TUPLE: urogue-gadget < gadget { p initial: T{ player f { 0 0 } } }
            [ { 5 8 } v+ first2 0.0 glVertex3f ]
            [ { 0 8 } v+ first2 0.0 glVertex3f ] } cleave ;
 
-:: draw-rect ( c p col -- )
+:: right-side? ( a b pt -- ? )
+    a b v- { { [ dup second 1.0 * 0.0 = ] [ drop pt second b second > ] }
+             { [ dup first  1.0 * 0.0 = ] [ drop pt first a first > ] }
+             [ first2 swap / a first pt first - * a second + pt first swap > ] }
+    cond ;
+
+:: draw-rect ( c p col center -- )
     col first3 glColor3f c [ first2 0 glVertex3f ] each glEnd
     GL_TRIANGLES glBegin c rest c first 1array append c
     ! the v- produces the magnitude of each axis
-    [ 2dup 2dup v- [ abs ] map dup 0 [ + ] reduce dup 2array v/ :> n
-      p v- first2 60 / n first * abs [ 62 / n second * abs ] dip + dup 0 glColor3f
-      drop first2 0 glVertex3f p first2 0 glVertex3f first2 0 glVertex3f ]
+    ! find the slope of the two points. 
+    
+    [ 2dup 2dup p right-side? center swap [ right-side? ] dip = not
+      [ 2dup 2dup v- [ abs ] map dup 0 [ + ] reduce dup 2array v/ :> n
+        p v- first2 60 / n first * abs [ 62 / n second * abs ] dip + dup 0 glColor3f
+        drop first2 0 glVertex3f p first2 0 glVertex3f first2 0 glVertex3f 1 1 ] when 
+      2drop ]
     2each glEnd ;
 
 : paint ( g -- )
@@ -52,7 +62,7 @@ TUPLE: urogue-gadget < gadget { p initial: T{ player f { 0 0 } } }
 
    GL_QUADS glBegin
    p>> pos>> { 2.5 4 } v+ { { -8 0 } { -8 -25.6 } { 8 -25.6 } { 8 0 } }
-   swap { 1 1 0 } draw-rect
+   swap { 1 1 0 } { 0 -12.8 } draw-rect
 
    ! Actually '60 / 16 * 1.6 *' and '62 / 16 *'
    ! 1.0 1.0 0 glColor3f
