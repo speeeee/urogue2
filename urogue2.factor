@@ -22,7 +22,9 @@ TUPLE: urogue-gadget < gadget { p initial: T{ player f { 0 0 } } }
 :: right-side? ( a b pt -- ? )
     a b v- { { [ dup second 1.0 * 0.0 = ] [ drop pt second b second > ] }
              { [ dup first  1.0 * 0.0 = ] [ drop pt first a first > ] }
-             [ first2 swap / a first pt first - * a second + pt first swap > ] }
+             ! Δy/Δx = s; ((bx-ptx)*s) = the change in x converted to Δy;
+             ! pty<ay+Δy
+             [ first2 swap / pt first a first - * a second + pt second swap < ] }
     cond ;
 
 :: draw-rect ( c p col center -- )
@@ -61,7 +63,7 @@ TUPLE: urogue-gadget < gadget { p initial: T{ player f { 0 0 } } }
    !  [ { 2.5 4 } v+ first2 0 glVertex3f ] } cleave 1 ] when drop
 
    GL_QUADS glBegin
-   p>> pos>> { 2.5 4 } v+ { { -8 0 } { -8 -25.6 } { 8 -25.6 } { 8 0 } }
+   p>> pos>> { 2.5 4 } v+ { { -25 0 } { -8 -25.6 } { 8 -25.6 } { 8 0 } }
    swap { 1 1 0 } { 0 -12.8 } draw-rect
 
    ! Actually '60 / 16 * 1.6 *' and '62 / 16 *'
