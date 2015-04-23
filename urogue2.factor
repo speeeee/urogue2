@@ -1,6 +1,6 @@
 USING: kernel math math.rectangles opengl opengl.gl ui ui.gadgets ui.render
  locals game.input game.input.scancodes ui.pixel-formats sequences io math.vectors
- accessors combinators timers calendar arrays ;
+ accessors combinators timers calendar arrays math.functions ;
 IN: urogue2
 
 TUPLE: player pos ;
@@ -27,16 +27,24 @@ TUPLE: urogue-gadget < gadget { p initial: T{ player f { 0 0 } } }
              [ first2 swap / pt first a first - * a second + pt second swap < ] }
     cond ;
 
-:: draw-rect ( c p col center -- )
+! Steve Ackermann
+
+:: draw-rect ( c p col center d -- )
     col first3 glColor3f c [ first2 0 glVertex3f ] each glEnd
-    GL_TRIANGLES glBegin c rest c first 1array append c
+    GL_QUADS glBegin c rest c first 1array append c
     ! the v- produces the magnitude of each axis
     ! find the slope of the two points. 
+
+    ! 100% means that it goes all the way to center.
     
     [ 2dup 2dup p right-side? center swap [ right-side? ] dip = not
       [ 2dup 2dup v- [ abs ] map dup 0 [ + ] reduce dup 2array v/ :> n
         p v- first2 60 / n first * abs [ 62 / n second * abs ] dip + dup 0 glColor3f
-        drop first2 0 glVertex3f p first2 0 glVertex3f first2 0 glVertex3f 1 1 ] when 
+        ! drop first2 0 glVertex3f p first2 0 glVertex3f first2 0 glVertex3f 1 1  when
+        drop 2dup 2dup p swap v- first2 swap / [ p swap v- first2 swap / ] dip 
+        2array [ 2array [ p v- first ] map ] dip swap 1 d - dup 2array v*
+        [ v* ] keep [ p first + swap p second + 0 glVertex3f ] 2each
+        first2 0 glVertex3f first2 0 glVertex3f 1 1 ] when
       2drop ]
     2each glEnd ;
 
@@ -64,7 +72,7 @@ TUPLE: urogue-gadget < gadget { p initial: T{ player f { 0 0 } } }
 
    GL_QUADS glBegin
    p>> pos>> { 2.5 4 } v+ { { -25 0 } { -8 -25.6 } { 8 -25.6 } { 8 0 } }
-   swap { 1 1 0 } { 0 -12.8 } draw-rect
+   swap { 1 1 0 } { 0 -12.8 } 0.2 draw-rect
 
    ! Actually '60 / 16 * 1.6 *' and '62 / 16 *'
    ! 1.0 1.0 0 glColor3f
